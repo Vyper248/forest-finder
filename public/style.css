@@ -1,0 +1,192 @@
+/*Header Page*/
+
+.myNav {
+	width: 100%;
+	background-color: lightGray;
+	padding: 10px;
+	height: 50px;
+}
+
+.myNav-right {
+	float: right;
+}
+
+.myNav-left {
+	float: left;
+}
+
+.navIcon {
+	font-size: 2em;
+	margin: 0px 10px;
+}
+
+/* ------- */
+
+header.jumbotron, .forestName, h1, h2 {
+	text-align: center;
+}
+
+h1 {
+	margin:10px;
+}
+
+.image {
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: black;
+    padding-top:65%;
+}
+
+.navbar-default {
+	border-radius: 0px;
+}
+
+h1 a {
+	color: inherit;
+}
+
+h1 a:hover {
+	text-decoration: none;
+}
+
+.btn:focus, .btn.active:focus, .btn:active:focus {
+	outline: none;
+}
+
+/* Registration */
+#registerError {
+	color: rgba(220,0,0,1);
+	font-weight: bold;
+	text-align: center;
+}
+
+/* Show page */
+
+.forestImageScroll {
+	background-position: 50% 50%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-color: black;
+	width: 100%;
+	display: inline-block;
+	padding-bottom:70%;
+}
+
+.forestContent {
+	text-align: center;
+	border: 1px solid lightgray;
+	border-radius: 10px 10px 0px 0px;
+	padding:0px;
+	width: 100%;
+	margin:auto;
+}
+
+#forestPrice {
+	float:right;
+	margin-right:10px;
+}
+
+#forestUser {
+	float: left;
+	margin-left: 10px;
+}
+
+#forestDescription {
+	clear: both;
+}
+
+.forestAddComment {
+	padding:10px;
+	margin-top:20px;
+	border: 1px solid lightgray;
+	padding-bottom: 0px;
+}
+
+.forestAddComment textarea {
+	width:100%;
+}
+
+.forestComments {
+	margin-top:20px;
+	border: 1px solid lightgray;
+	overflow: hidden;
+	margin-bottom:70px;
+}
+
+.forestMainContainer>div:last-of-type {
+	border-radius: 0px 0px 10px 10px;
+}
+
+.comment {
+	padding:10px;
+	position:relative;
+}
+
+.comment p {
+	margin:0px;
+}
+
+.commentButtons {
+	position: absolute;
+	right:0px;
+	top:0px;
+}
+
+.commentButtons button {
+	border: none;
+	background: none;
+	color: gray;
+}
+
+.comment:nth-of-type(2n) {
+	background-color: rgba(0,200,0,0.1);
+}
+
+#deleteForestForm {
+	display: inline;
+}
+
+/*LANDING PAGE*/
+.mainContainer {
+	display: table;
+	height: 100%;
+	position: absolute;
+	overflow: hidden;
+	width: 100%;
+	transform: translateY(-72px);
+	background: url('https://s-media-cache-ak0.pinimg.com/originals/c2/95/28/c29528f8e70845ca1b11bb9a907e5063.jpg');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	z-index: 0;
+}
+
+.helper {
+	#position: absolute;
+	#top: 50%;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.centralText {
+	#position: relative;
+	#top: 50%;
+	width:500px;
+	margin:auto;
+	text-align: center;
+	color: white;
+	background-color: rgba(0,0,0,0.4);
+	padding: 0px 10px 10px 10px;
+	border-radius: 5px;
+	border: 1px solid rgba(200,200,200,0.5);
+}
+
+.centralText p {
+	font-size: 1.7em;
+}
+
+.centralText h1 {
+	font-size: 5em;
+	font-weight: bold;
+}

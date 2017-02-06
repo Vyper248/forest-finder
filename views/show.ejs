@@ -1,0 +1,197 @@
+<% include partials/header %>
+
+<!-- Delete Popup -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Delete Forest</h4>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this forest?
+      </div>
+      <div class="modal-footer">
+        <form id="deleteForestForm" action="/forests/<%=forest._id%>?_method=DELETE" method="POST">
+			<button class="btn btn-danger">Delete Forest</button>
+		</form>
+		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal End -->
+
+<div class="container">
+
+<div class="col-md-3">
+	<div id="map" style="width:100%; height:300px;"></div><br>
+</div>
+
+<div class="col-md-9 forestMainContainer">
+<!-- SHOW FOREST INFORMATION -->
+	<div class="forestContent">
+		<h2><%= forest.name %></h2>
+
+		<div class="forestImageScroll" style="background-image:url('<%= forest.image%>')"></div>
+
+		<p>
+			<em id="forestUser">Added By: <%=forest.user.username%></em>
+            <span id="forestPrice">Parking: £<%=forest.price%></span>
+		</p>
+		<p id="forestDescription"><%=forest.description%></p>
+		<% if (user && forest.user.id.equals(user._id)) { %>
+			<p>
+			<a href="/forests/<%=forest._id%>/edit" class="btn btn-warning">Edit Forest</a>
+			<button class="btn btn-danger" data-toggle="modal" data-target="#myModal">Delete Forest</button>
+			</p>
+		<% } %>
+	</div>
+<!-- ======================================= -->
+
+<!-- SHOW ADD COMMENT FORM IF LOGGED IN -->
+	<% if (loggedIn) { %>
+		<div class="forestAddComment">
+			<strong><p>New Comment:</p></strong>
+			<form class="form-group" action="/forests/<%=forest._id%>/comments" method="POST">
+				<textarea name="content" rows="5" placeholder="New Comment" required minlength="10"></textarea>
+				<input class="form-control btn-primary" type="submit" value="Submit">
+			</form>
+		</div>
+	<% } else {%>
+		<div class="forestAddComment">
+			<p>
+			Please <a href="/login">sign in</a> to add a comment.
+			</p>
+		</div>
+	<% } %>
+<!-- ======================================= -->
+
+<!-- SHOW COMMENTS -->
+	<% if (forest.comments.length > 0) { %>
+		<div class="forestComments">
+
+		<% forest.comments.sort(function(a,b){ %>
+		<%		return b.created - a.created; %>
+		<%	}); %>
+
+		<% for (var i = 0; i < forest.comments.length; i++) { -%>
+			<div class="comment" id='<%=forest.comments[i]._id%>'>
+			<strong><%=forest.comments[i].user.username%></strong> - <%=forest.comments[i].created.toDateString()%>
+			<p class='commentContent'><%=forest.comments[i].content%></p>
+			<% if (user && forest.comments[i].user.id.equals(user._id)) { %>
+				<p class='commentButtons'>
+					<button class='editComment btn btn-default btn-xs'>edit</button>
+					<button class='deleteCommentSetup btn btn-default btn-xs'
+						data-toggle="popover" title="Are you sure?"
+						data-trigger="focus" data-container="body"
+						data-placement="left" data-html="true"
+						data-content="<button class='deleteComment btn btn-danger btn-sm'>Delete</button> <button class='btn btn-default btn-sm'>Cancel</button>">
+							delete
+					</button>
+				</p>
+			<% } %>
+			</div>
+		<% } -%>
+		</div>
+	<%}%>
+</div>
+<!-- ======================================= -->
+</div>
+
+<script>
+	function myMap(){
+		var center = new google.maps.LatLng(<%=forest.lat%>, <%=forest.lon%>);
+		var mapOptions1 = {
+			center: center,
+			zoom: 9,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
+		var map = new google.maps.Map(document.getElementById("map"), mapOptions1);
+		var marker = new google.maps.Marker({position: center});
+		marker.setMap(map);
+
+		// google.maps.event.addListener(map,'click',function(event) {
+  //   		map.setCenter(event.latLng);
+		// });
+	}
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHbtNh2oghHRcCeBLF4DEIFvAxaKxtZz8&callback=myMap"></script>
+
+<% if (user) { %>
+<script>
+	var prevHTML = '';
+	var prevComment = null;
+
+	$(function(){
+          $('[data-toggle="popover"]').popover();
+    });
+
+	//when user clicks to edit their comment, change to text area, save html
+	$('.comment').on('click', '.editComment', function(){
+		if (prevComment !== null){
+			prevComment.html(prevHTML);
+		}
+
+		var commentDiv = $(this).closest('.comment');
+		var commentText = commentDiv.find('.commentContent').text();
+		var id = commentDiv.attr('id');
+		prevHTML = commentDiv.html();
+		prevComment = commentDiv;
+		commentDiv.html('');//clear comment div
+		//add text area and buttons
+		$('<textarea class="commentContent" name="content" rows="5" placeholder="Edit Comment" minlength="10" required></textarea>').text(commentText).css('width','100%').appendTo(commentDiv);
+		$('<input class="btn btn-primary submitEdit" type="submit" value="Submit" style="margin-right:5px;">').appendTo(commentDiv);
+		$('<input class="btn btn-danger submitCancel" type="submit" value="Cancel">').appendTo(commentDiv);
+	});
+
+	//send text area content to server to update database
+	$('.comment').on('click', '.submitEdit', function(e){
+		e.preventDefault();
+		var commentDiv = $(this).closest('.comment');
+		var commentText = commentDiv.find('.commentContent').val();
+		var id = commentDiv.attr('id');
+		$.post('/forests/<%=forest._id%>/comments/'+id+'?_method=PUT', {content: commentText}, function(data){
+			if (data === 'true'){
+				commentDiv.html(prevHTML);
+				commentDiv.find('.commentContent').text(commentText);
+			} else {
+				commentDiv.html(prevHTML);
+			}
+			prevHTML = '';
+			prevComment = null;
+			$('[data-toggle="popover"]').popover();//have to reinitialize popovers after restoring html
+		});
+	});
+
+	//if user cancels, just restore the html
+	$('.comment').on('click', '.submitCancel', function(e){
+		e.preventDefault();
+		prevComment.html(prevHTML);
+		prevHTML = '';//set these to empty
+		prevComment = null;
+		$('[data-toggle="popover"]').popover();//have to reinitialize popovers after restoring html
+	});
+
+	//used for storing values since popover isn't within the comment element
+	var deleteCommentDiv;
+	var deleteID;
+	$('body').on('click', '.deleteCommentSetup', function(){
+		deleteCommentDiv = $(this).closest('.comment');
+		deleteID = deleteCommentDiv.attr('id');
+	});
+
+	//when clicking on confirm, send delete request to server
+	$('body').on('click', '.deleteComment', function(){
+		$.post('/forests/<%=forest._id%>/comments/'+deleteID+'?_method=delete', function(data){
+			if (data === 'true'){
+				deleteCommentDiv.remove();
+			}
+		});
+	});
+</script>
+
+<% } %>
+
+<% include partials/footer %>

@@ -1,0 +1,68 @@
+<% include partials/header %>
+
+<div class="container">
+
+	<div  class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10">
+
+		<h2>Add a New Forest</h2>
+
+		<div id="map" style="width:100%; height:300px;"></div><br>
+
+		<form action="/forests" method="POST">
+			<div class="form-group">
+				<input type="text" id="name" class="form-control" name="name" placeholder="Name Of Forest" required>
+			</div>
+			<div class="form-group">
+				<input type="text" id="image" class="form-control" name="image" placeholder="Image URL" required>
+			</div>
+			<div class="form-group">
+				<input type="text" id="description" class="form-control" name="description" placeholder="Description" required>
+			</div>
+			<div class="form-group">
+				<input type="number" id="price" class="form-control" name="price" placeholder="Parking Cost" min="0.00" step="0.01" required>
+			</div>
+			<input type="hidden" name="lat" value="51" id="mapLat">
+			<input type="hidden" name="lon" value="0.2" id="mapLon">
+			<input type="submit" class="btn btn-primary form-control" value="Submit">
+
+		</form>
+		<br>
+		<a href="/forests">Go Back</a>
+
+	</div>
+
+</div>
+
+<script>
+	function myMap(){
+		var center = new google.maps.LatLng(51.5, -0.2);
+		var mapOptions1 = {
+			center: center,
+			zoom: 3,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
+		var map = new google.maps.Map(document.getElementById("map"), mapOptions1);
+		var marker = new google.maps.Marker({position: center});
+		marker.setMap(map);
+
+		google.maps.event.addListener(map,'click',function(event) {
+			var position = event.latLng;
+			document.getElementById("mapLat").setAttribute("value",position.lat());
+			document.getElementById("mapLon").setAttribute("value",position.lng());
+    		map.setCenter(position);
+    		marker.setPosition(position);
+		});
+
+		google.maps.event.addListener(map,'dragend',function(event) {
+			var position = map.getCenter();
+    		marker.setPosition(position);
+    		document.getElementById("mapLat").setAttribute("value",position.lat());
+			document.getElementById("mapLon").setAttribute("value",position.lng());
+		});
+	}
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHbtNh2oghHRcCeBLF4DEIFvAxaKxtZz8&callback=myMap"></script>
+
+
+<% include partials/footer %>
