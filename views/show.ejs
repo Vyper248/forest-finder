@@ -187,9 +187,13 @@
 		$.post('/forests/<%=forest._id%>/comments/'+deleteID+'?_method=delete', function(data){
 			if (data === 'true'){
 				deleteCommentDiv.remove();
+                if ($(".comment").length === 0){
+                    $(".forestComments").remove();
+                }
 			}
 		});
 	});
+
 </script>
 
 <% } %>

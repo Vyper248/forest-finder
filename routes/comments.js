@@ -22,6 +22,7 @@ routes.post('/forests/:id/comments', middle.isLoggedIn, function(req, res){
 	});
 });
 
+//UPDATE COMMENT
 routes.put('/forests/:id/comments/:commentId', middle.isLoggedIn, middle.ownsComment, function(req, res){
 	Comment.findByIdAndUpdate(req.params.commentId, req.body, function(err, comment){
 		if (err){
@@ -32,7 +33,16 @@ routes.put('/forests/:id/comments/:commentId', middle.isLoggedIn, middle.ownsCom
 	});
 });
 
+//DELETE COMMENT - and remove from forest object too
 routes.delete('/forests/:id/comments/:commentId', middle.isLoggedIn, middle.ownsComment, function(req, res){
+	Forest.findById(req.params.id, function(err, forest){
+		if (err) console.log(err);
+		//get index of commentID in forest.comments array and remove it
+		var comIdx = forest.comments.indexOf(req.params.commentID);
+		forest.comments.splice(comIdx, 1);
+		forest.save();
+	});
+
 	Comment.findByIdAndRemove(req.params.commentId, req.body, function(err, comment){
 		if (err){
 			console.log(err);
