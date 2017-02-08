@@ -40,10 +40,10 @@ routes.get('/forests/:id', function(req, res){
 	Forest.findById(id).populate('comments').exec(function(err, forest){
 		if (err){
 			console.log(err);
-			req.flash('error', err.message);
+			req.flash('error','This forest could not be found.');
 			return res.redirect('/forests');
 		}
-		res.render('show',{forest:forest, loggedIn: req.isAuthenticated()});
+		return res.render('show',{forest:forest, loggedIn: req.isAuthenticated()});
 	});
 });
 

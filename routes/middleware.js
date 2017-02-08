@@ -21,6 +21,7 @@ middlewareObject.isOwnerOfForest = function(req, res, next){
 	Forest.findById(req.params.id, function(err, forest){
 		if (err){
 			console.log(err);
+			return res.redirect('/forests/'+req.params.id);
 		}
 		if (forest.user.id.equals(req.user._id)){
 			return next();
