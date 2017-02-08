@@ -19,6 +19,12 @@ var forestSchema = new mongoose.Schema({
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Comment"
 		}
+	],
+	ratings: [
+		{
+			username: String,
+			rating: Number
+		}
 	]
 });
 

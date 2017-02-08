@@ -18,6 +18,7 @@ var commentRoutes = require('./routes/comments');
 var authRoutes = require('./routes/auth');
 var forestRoutes = require('./routes/forests');
 var userRoutes = require('./routes/users');
+var ratingRoutes = require('./routes/ratings');
 
 //SETUP
 app.set('view engine', 'ejs');
@@ -67,6 +68,7 @@ app.use(forestRoutes);
 app.use(commentRoutes);
 app.use(authRoutes);
 app.use(userRoutes);
+app.use(ratingRoutes);
 
 app.get('/*', function(req, res){
 	req.flash("error","Error 404: The page you requested could not be found.");

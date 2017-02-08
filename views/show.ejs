@@ -24,79 +24,133 @@
 
 <div class="container">
 
-<div class="col-md-3">
-	<div id="map" style="width:100%; height:300px;"></div><br>
-</div>
+    <div class="row">
 
-<div class="col-md-9 forestMainContainer">
-<!-- SHOW FOREST INFORMATION -->
-	<div class="forestContent">
-		<h2><%= forest.name %></h2>
+        <div class="col-md-9 col-md-push-3">
+        <!-- SHOW FOREST INFORMATION -->
+        	<div class="forestContent">
+        		<h2><%= forest.name %></h2>
 
-		<div class="forestImageScroll" style="background-image:url('<%= forest.image%>')"></div>
+        		<div class="forestImageScroll" style="background-image:url('<%= forest.image%>')"></div>
 
-		<p>
-			<em id="forestUser">Added By: <%=forest.user.username%></em>
-            <span id="forestPrice">Parking: £<%=forest.price%></span>
-		</p>
-		<p id="forestDescription"><%=forest.description%></p>
-		<% if (user && forest.user.id.equals(user._id)) { %>
-			<p>
-			<a href="/forests/<%=forest._id%>/edit" class="btn btn-warning">Edit Forest</a>
-			<button class="btn btn-danger" data-toggle="modal" data-target="#myModal">Delete Forest</button>
-			</p>
-		<% } %>
-	</div>
-<!-- ======================================= -->
+        		<p>
+        			<em id="forestUser">Added By: <%=forest.user.username%></em>
+                    <span id="forestPrice">Parking: £<%=forest.price%></span>
+        		</p>
+        		<p id="forestDescription"><%=forest.description%></p>
+        		<% if (user && forest.user.id.equals(user._id)) { %>
+        			<p>
+        			<a href="/forests/<%=forest._id%>/edit" class="btn btn-warning">Edit Forest</a>
+        			<button class="btn btn-danger" data-toggle="modal" data-target="#myModal">Delete Forest</button>
+        			</p>
+        		<% } %>
+        	</div>
+        <!-- ======================================= -->
+        </div>
 
-<!-- SHOW ADD COMMENT FORM IF LOGGED IN -->
-	<% if (loggedIn) { %>
-		<div class="forestAddComment">
-			<strong><p>New Comment:</p></strong>
-			<form class="form-group" action="/forests/<%=forest._id%>/comments" method="POST">
-				<textarea name="content" rows="5" placeholder="New Comment" required minlength="10"></textarea>
-				<input class="form-control btn-primary" type="submit" value="Submit">
-			</form>
-		</div>
-	<% } else {%>
-		<div class="forestAddComment">
-			<p>
-			Please <a href="/login">sign in</a> to add a comment.
-			</p>
-		</div>
-	<% } %>
-<!-- ======================================= -->
+        <!-- SHOW MAP AND RATINGS ================== -->
+        <div class="col-md-3 col-md-pull-9">
+            <div class="row">
+                <div class="col-md-12 col-sm-8">
+                    <h4>Location</h4>
+                    <div id="map" style="width:100%; height:300px;"></div>
+                </div>
+                <div class="col-md-12 col-sm-4">
+                    <div id="ratings">
+                        <h4>Ratings</h4>
+                        <% var ratings = forest.ratings || []; %>
+                        <% var userRating = 0; %>
+                        <% ratings = ratings.map(function(obj){if (user && obj.username === user.username){ userRating = obj.rating;}; return obj.rating}); %>
+                        <%# ratings.push(...[5,5,5,5,4,4,3,3,4,4,5,5,5,4,3,3,3,2,1,5,5,4,3]); %>
+                        <% var totalRatings = ratings.length; %>
+                        <% var average = ratings.reduce(function(t,c){return t+=c;}, 0)/totalRatings || 0; %>
+                        <% average = Math.round(average); %>
+                        <% for (var i = 5; i > 0; i--){ %>
+                            <% var starRatings = ratings.filter(function(num){return num === i;}).length; %>
+                            <% var percentage = Math.round((starRatings/totalRatings)*100); %>
+                            <div id="ratingContainer">
+                                <span class="ratingText"><%= i %> Stars</span>
+                                <div class="progress"><div class="progress-bar progress-bar-warning" id="ratingProgress<%=i%>" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: <%=percentage%>%;"></div></div>
+                                <span class="ratingText ratingQuantity" id="ratingQuantity<%=i%>"><%= starRatings %></span>
+                            </div>
+                        <% } %>
+                        <div class="rating-stars">
+                            <% for (var i = 1; i <= 5; i++) { %>
+                                <% if (i <= average) { %>
+                                    <span class="glyphicon glyphicon-star" id="avgRating<%=i%>" aria-hidden="true"></span>
+                                <% } else { %>
+                                    <span class="glyphicon glyphicon-star-empty" id="avgRating<%=i%>" aria-hidden="true"></span>
+                                <% } %>
+                            <% } %>
+                        </div>
+                        <% if (user) { %>
+                        <h5 class="userRating">Your Rating: &nbsp;
+                            <% for (var i = 1; i <= 5; i++) { %>
+                                <% if (i <= userRating) { %>
+                                    <span class="glyphicon glyphicon-star userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
+                                <% } else { %>
+                                    <span class="glyphicon glyphicon-star-empty userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
+                                <% } %>
+                            <% } %>
+                        </h5>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ======================================= -->
 
-<!-- SHOW COMMENTS -->
-	<% if (forest.comments.length > 0) { %>
-		<div class="forestComments">
+        <div class="col-md-9 col-md-offset-3 forestMainContainer">
+        <!-- SHOW ADD COMMENT FORM IF LOGGED IN -->
+        	<% if (loggedIn) { %>
+        		<div class="forestAddComment">
+        			<strong><p>New Comment:</p></strong>
+        			<form class="form-group" action="/forests/<%=forest._id%>/comments" method="POST">
+        				<textarea name="content" rows="5" placeholder="New Comment" required minlength="10"></textarea>
+        				<input class="form-control btn-primary" type="submit" value="Submit">
+        			</form>
+        		</div>
+        	<% } else {%>
+        		<div class="forestAddComment">
+        			<p>
+        			Please <a href="/login">sign in</a> to add a comment.
+        			</p>
+        		</div>
+        	<% } %>
+        <!-- ======================================= -->
 
-		<% forest.comments.sort(function(a,b){ %>
-		<%		return b.created - a.created; %>
-		<%	}); %>
+        <!-- SHOW COMMENTS -->
+        	<% if (forest.comments.length > 0) { %>
+        		<div class="forestComments">
 
-		<% for (var i = 0; i < forest.comments.length; i++) { -%>
-			<div class="comment" id='<%=forest.comments[i]._id%>'>
-			<strong><%=forest.comments[i].user.username%></strong> - <%=forest.comments[i].created.toDateString()%>
-			<p class='commentContent'><%=forest.comments[i].content%></p>
-			<% if (user && forest.comments[i].user.id.equals(user._id)) { %>
-				<p class='commentButtons'>
-					<button class='editComment btn btn-default btn-xs'>edit</button>
-					<button class='deleteCommentSetup btn btn-default btn-xs'
-						data-toggle="popover" title="Are you sure?"
-						data-trigger="focus" data-container="body"
-						data-placement="left" data-html="true"
-						data-content="<button class='deleteComment btn btn-danger btn-sm'>Delete</button> <button class='btn btn-default btn-sm'>Cancel</button>">
-							delete
-					</button>
-				</p>
-			<% } %>
-			</div>
-		<% } -%>
-		</div>
-	<%}%>
-</div>
-<!-- ======================================= -->
+        		<% forest.comments.sort(function(a,b){ %>
+        		<%		return b.created - a.created; %>
+        		<%	}); %>
+
+        		<% for (var i = 0; i < forest.comments.length; i++) { -%>
+        			<div class="comment" id='<%=forest.comments[i]._id%>'>
+        			<strong><%=forest.comments[i].user.username%></strong> - <%=forest.comments[i].created.toDateString()%>
+        			<p class='commentContent'><%=forest.comments[i].content%></p>
+        			<% if (user && forest.comments[i].user.id.equals(user._id)) { %>
+        				<p class='commentButtons'>
+        					<button class='editComment btn btn-default btn-xs'>edit</button>
+        					<button class='deleteCommentSetup btn btn-default btn-xs'
+        						data-toggle="popover" title="Are you sure?"
+        						data-trigger="focus" data-container="body"
+        						data-placement="left" data-html="true"
+        						data-content="<button class='deleteComment btn btn-danger btn-sm'>Delete</button> <button class='btn btn-default btn-sm'>Cancel</button>">
+        							delete
+        					</button>
+        				</p>
+        			<% } %>
+        			</div>
+        		<% } -%>
+        		</div>
+        	<%}%>
+        </div>
+        <!-- ======================================= -->
+    </div>
+
 </div>
 
 <script>
@@ -193,6 +247,66 @@
 			}
 		});
 	});
+
+    //COMMENTS =============================================
+    $('.userRatingStar').on('mouseover', function(){
+        var id = $(this).attr('id').slice(6,7);
+        for (var i = 1; i <= 5; i++){
+            if (i <= id){
+                $('#rating'+i).addClass('glyphicon-star').removeClass('glyphicon-star-empty');
+            } else {
+                $('#rating'+i).addClass('glyphicon-star-empty').removeClass('glyphicon-star');
+            }
+        }
+    });
+
+    var userRating = 0;
+    var allRatings = [];
+    //if ratings exist for this forest, get user rating (if that also exists - from above)
+    <% if (forest.ratings) { %>
+        userRating = <%= userRating %>;
+        allRatings = <%- JSON.stringify(forest.ratings.map(function(obj){return obj.rating;})) %>;
+    <% } %>
+    $('.userRating').on('mouseleave', function(){
+        for (var i = 1; i <= 5; i++){
+            if (i <= userRating){
+                $('#rating'+i).addClass('glyphicon-star').removeClass('glyphicon-star-empty');
+            } else {
+                $('#rating'+i).addClass('glyphicon-star-empty').removeClass('glyphicon-star');
+            }
+        }
+    });
+
+    $('.userRatingStar').on('click', function(){
+        var id = $(this).attr('id').slice(6,7);
+        $.post('/forests/<%=forest._id%>/ratings', {user: '<%=user.username%>', rating:id}, function(data){
+            if (data === 'true'){
+                //do something?
+                updateRatingFrom(userRating, id);
+            }
+        });
+    });
+
+    function updateRatingFrom(oldRating, newRating){
+        userRating = parseInt(newRating);
+        if (oldRating !== 0) allRatings.splice(allRatings.indexOf(oldRating), 1);
+        allRatings.push(userRating);
+
+        var totalRatings = allRatings.length;
+        var average = allRatings.reduce(function(t,c){return t+=c;}, 0)/totalRatings || 0;
+        average = Math.round(average);
+        for (var i = 5; i > 0; i--){
+            var starRatings = allRatings.filter(function(num){return num === i;}).length;
+            var percentage = Math.round((starRatings/totalRatings)*100);
+            $('#ratingProgress'+i).css('width',percentage+'%');
+            $('#ratingQuantity'+i).text(starRatings);
+            if (i <= average){
+                $('#avgRating'+i).addClass('glyphicon-star').removeClass('glyphicon-star-empty');
+            } else {
+                $('#avgRating'+i).addClass('glyphicon-star-empty').removeClass('glyphicon-star');
+            }
+        }
+    }
 
 </script>
 
