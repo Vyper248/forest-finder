@@ -38,7 +38,7 @@ routes.delete('/forests/:id/comments/:commentId', middle.isLoggedIn, middle.owns
 	Forest.findById(req.params.id, function(err, forest){
 		if (err) console.log(err);
 		//get index of commentID in forest.comments array and remove it
-		var comIdx = forest.comments.indexOf(req.params.commentID);
+		var comIdx = forest.comments.indexOf(req.params.commentId);
 		forest.comments.splice(comIdx, 1);
 		forest.save();
 	});

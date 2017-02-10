@@ -61,6 +61,27 @@ h1 a:hover {
 	text-align: center;
 }
 
+/* Add Forest Page - Map Search Box */
+#mapSearchForm {
+	background-color: white;
+	border: 1px solid #999;
+	width: 230px;
+	text-align: center;
+	padding: 5px;
+	position: absolute;
+	top: 68px;
+	right: 20px;
+}
+
+@media screen and (max-width: 480px) {
+	#mapSearchForm { width:165px; }
+	#mapSearch { width: 85px; }
+}
+
+#mapSubmit {
+
+}
+
 /* Show page */
 
 .forestImageScroll {

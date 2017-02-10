@@ -35,7 +35,7 @@ routes.get('/forests/new', middle.isLoggedIn, function(req, res){
 
 //SHOW - show more information for a forest (has to be after /forests/new)
 routes.get('/forests/:id', function(req, res){
-	global.desiredRoute = '/forests/'+req.params.id;
+	//global.desiredRoute = '/forests/'+req.params.id;
 	var id = req.params.id;
 	Forest.findById(id).populate('comments').exec(function(err, forest){
 		if (err){
@@ -43,7 +43,7 @@ routes.get('/forests/:id', function(req, res){
 			req.flash('error','This forest could not be found.');
 			return res.redirect('/forests');
 		}
-		return res.render('show',{forest:forest, loggedIn: req.isAuthenticated()});
+		return res.render('show',{forest:forest});
 	});
 });
 
@@ -75,24 +75,23 @@ routes.put('/forests/:id', middle.isLoggedIn, middle.isOwnerOfForest, function(r
 //DELETE - delete a forest page - needs to remove comments too
 routes.delete('/forests/:id', middle.isLoggedIn, middle.isOwnerOfForest, function(req, res){
 	Forest.findById(req.params.id, function(err, forest){
-		if (err){
-			console.log(err);
-		}
-		forest.comments.forEach(function(comment){
-			Comment.findByIdAndRemove(comment, function(err){
+		forest.comments.forEach(function(id){
+			Comment.findByIdAndRemove(id, function(err){
 				if (err){
 					console.log(err);
 				}
 			});
 		});
-	});
 
-	Forest.findByIdAndRemove(req.params.id, function(err){
-		if (err){
-			console.log(err);
-		}
-		req.flash('success', 'Forest has been deleted.');
-		return res.redirect('/forests');
+		forest.remove(function(err){
+			if (err){
+				console.log(err);
+				req.flash('error', 'There was a problem deleting the forest.');
+				return res.redirect('/forests');
+			}
+			req.flash('success', 'Forest has been deleted.');
+			return res.redirect('/forests');
+		});
 	});
 });
 
