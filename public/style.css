@@ -113,6 +113,8 @@ h1 a:hover {
 
 #forestDescription {
 	clear: both;
+	margin-left: 10px;
+	margin-right: 10px;
 }
 
 .forestAddComment {
