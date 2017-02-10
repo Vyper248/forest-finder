@@ -69,6 +69,10 @@
 		$('#mapSubmit').on('click', function(){
 			geocodeAddress(geocoder, map, marker);
 		});
+
+		$('#mapSearch').on('keypress', function(e){
+			if (e.which === 13) geocodeAddress(geocoder, map, marker);
+		});
 	}
 
 	function geocodeAddress(geocoder, resultsMap, marker) {
