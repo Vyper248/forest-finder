@@ -76,7 +76,7 @@ app.get('/*', function(req, res){
 });
 
 //LISTEN====================================================
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 34862;
 var ip = process.env.IP;
 app.listen(port, ip, function(){
 	console.log('Forest server started on port '+port);
