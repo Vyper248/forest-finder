@@ -7,6 +7,7 @@ var forestSchema = new mongoose.Schema({
 	price: String,
 	lon: Number,
 	lat: Number,
+	created: {type: Date, default: Date.now},
 	user: {
 		id: {
 			type: mongoose.Schema.Types.ObjectId,

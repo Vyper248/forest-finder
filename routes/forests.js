@@ -9,6 +9,7 @@ routes.get('/forests', function(req, res){
 	global.desiredRoute = req.route.path;
 	Forest.find({},function(err, forests){
 		if (err) return handleError(err);
+		forests = forests.sort(function(a,b){return a.created - b.created});
 		res.render('index', {forests: forests});
 	});
 });
