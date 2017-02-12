@@ -198,11 +198,19 @@ h1 a:hover {
 
 .rating-stars {
 	text-align: center;
-	color: orange;
+	font-size: 0.8em;
+	color: #f80;
+	display: inline-block;
 }
 
 .userRating {
 	cursor: default;
+}
+
+.userRating span {
+	margin-top:5px;
+	font-size: 1.5em;
+	color: #f80;
 }
 
 /*LANDING PAGE*/
