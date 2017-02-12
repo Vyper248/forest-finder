@@ -57,7 +57,7 @@
                 </div>
                 <div class="col-md-12 col-sm-4">
                     <div id="ratings">
-                        <h4>Rating - 
+                        <h4>Rating -
                             <div class="rating-stars">
                                 <% for (var i = 1; i <= 5; i++) { %>
                                     <% if (i <= ratings.average) { %>
@@ -75,7 +75,7 @@
                             <% var percentage = (starRatings / ratings.totalRatings)*100; %>
                             <div id="ratingContainer">
                                 <span class="ratingText"><%= i %> Stars</span>
-                                <div class="progress"><div class="progress-bar progress-bar-warning" id="ratingProgress<%=i%>" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: <%=percentage%>%;"></div></div>
+                                <div class="progress"><div class="progress-bar progress-bar-warning" id="ratingProgress<%=i%>" role="progressbar" aria-valuenow="<%=percentage%>" aria-valuemin="0" aria-valuemax="100" style="width: <%=percentage%>%;"></div></div>
                                 <span class="ratingText ratingQuantity" id="ratingQuantity<%=i%>"><%= starRatings %></span>
                             </div>
                         <% } %>
@@ -275,7 +275,7 @@
             for (var i = 5; i > 0; i--){
                 var starRatings = ratings.starRatings[i-1];
                 var percentage = Math.round((starRatings/ratings.totalRatings)*100);
-                $('#ratingProgress'+i).css('width',percentage+'%');
+                $('#ratingProgress'+i).css('width',percentage+'%').attr('aria-valuenow',percentage);
                 $('#ratingQuantity'+i).text(starRatings);
             }
             adjustStarRatings('avgRating', ratings.average);
