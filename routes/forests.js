@@ -44,9 +44,37 @@ routes.get('/forests/:id', function(req, res){
 			req.flash('error','This forest could not be found.');
 			return res.redirect('/forests');
 		}
-		return res.render('show',{forest:forest});
+		var ratings = getRatingObject(forest, req.user);
+		console.log(ratings);
+		return res.render('show',{forest:forest, ratings: ratings});
 	});
 });
+
+function getRatingObject(forest, user){
+	var ratingObject = {};
+	if (forest.ratings && forest.ratings.length > 0){
+		var userRating = 0;
+		//array of ratings without user information
+		var allRatings = forest.ratings.map(function(obj){
+			if (user && obj.username === user.username) userRating = obj.rating;
+			return obj.rating;
+		});
+		var average = allRatings.reduce(function(t,c){return t+=c;})/allRatings.length;
+		var starRatings = [];
+		for(var i = 1; i <= 5; i++){
+			var starRating = allRatings.filter(function(num){return num === i}).length;
+			starRatings.push(starRating);
+		}
+		
+		ratingObject.totalRatings = allRatings.length;
+		ratingObject.starRatings = starRatings;
+		ratingObject.userRating = userRating;
+		ratingObject.allRatings = allRatings;
+		ratingObject.average = average;
+	}
+
+	return ratingObject;
+}
 
 //EDIT - edit a forest page
 routes.get('/forests/:id/edit', middle.isLoggedIn, middle.isOwnerOfForest, function(req, res){
@@ -76,12 +104,8 @@ routes.put('/forests/:id', middle.isLoggedIn, middle.isOwnerOfForest, function(r
 //DELETE - delete a forest page - needs to remove comments too
 routes.delete('/forests/:id', middle.isLoggedIn, middle.isOwnerOfForest, function(req, res){
 	Forest.findById(req.params.id, function(err, forest){
-		forest.comments.forEach(function(id){
-			Comment.findByIdAndRemove(id, function(err){
-				if (err){
-					console.log(err);
-				}
-			});
+		Comment.remove({_id : {$in: forest.comments}}, function(err){
+			if (err) console.log(err);
 		});
 
 		forest.remove(function(err){

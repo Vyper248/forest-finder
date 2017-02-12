@@ -58,16 +58,9 @@
                 <div class="col-md-12 col-sm-4">
                     <div id="ratings">
                         <h4>Ratings</h4>
-                        <% var ratings = forest.ratings || []; %>
-                        <% var userRating = 0; %>
-                        <% ratings = ratings.map(function(obj){if (user && obj.username === user.username){ userRating = obj.rating;}; return obj.rating}); %>
-                        <%# ratings.push(...[5,5,5,5,4,4,3,3,4,4,5,5,5,4,3,3,3,2,1,5,5,4,3]); %>
-                        <% var totalRatings = ratings.length; %>
-                        <% var average = ratings.reduce(function(t,c){return t+=c;}, 0)/totalRatings || 0; %>
-                        <% average = Math.round(average); %>
                         <% for (var i = 5; i > 0; i--){ %>
-                            <% var starRatings = ratings.filter(function(num){return num === i;}).length; %>
-                            <% var percentage = Math.round((starRatings/totalRatings)*100); %>
+                            <% var starRatings = ratings.starRatings[i-1]; %>
+                            <% var percentage = (starRatings / ratings.totalRatings)*100; %>
                             <div id="ratingContainer">
                                 <span class="ratingText"><%= i %> Stars</span>
                                 <div class="progress"><div class="progress-bar progress-bar-warning" id="ratingProgress<%=i%>" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: <%=percentage%>%;"></div></div>
@@ -76,7 +69,7 @@
                         <% } %>
                         <div class="rating-stars">
                             <% for (var i = 1; i <= 5; i++) { %>
-                                <% if (i <= average) { %>
+                                <% if (i <= ratings.average) { %>
                                     <span class="glyphicon glyphicon-star" id="avgRating<%=i%>" aria-hidden="true"></span>
                                 <% } else { %>
                                     <span class="glyphicon glyphicon-star-empty" id="avgRating<%=i%>" aria-hidden="true"></span>
@@ -84,15 +77,15 @@
                             <% } %>
                         </div>
                         <% if (user) { %>
-                        <h5 class="userRating">Your Rating: &nbsp;
+                        <h4 class="userRating">Your Rating: <br>
                             <% for (var i = 1; i <= 5; i++) { %>
-                                <% if (i <= userRating) { %>
+                                <% if (i <= ratings.userRating) { %>
                                     <span class="glyphicon glyphicon-star userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
                                 <% } else { %>
                                     <span class="glyphicon glyphicon-star-empty userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
                                 <% } %>
                             <% } %>
-                        </h5>
+                        </h4>
                         <% } %>
                     </div>
                 </div>
@@ -106,7 +99,7 @@
         		<div class="forestAddComment">
         			<strong><p>New Comment:</p></strong>
         			<form class="form-group" action="/forests/<%=forest._id%>/comments" method="POST">
-        				<textarea name="content" rows="5" placeholder="New Comment" required minlength="10"></textarea>
+        				<textarea name="content" rows="5" placeholder="New Comment" required minlength="4"></textarea>
         				<input class="form-control btn-primary" type="submit" value="Submit">
         			</form>
         		</div>
@@ -265,8 +258,8 @@
     var allRatings = [];
     //if ratings exist for this forest, get user rating (if that also exists - from above)
     <% if (forest.ratings) { %>
-        userRating = <%= userRating %>;
-        allRatings = <%- JSON.stringify(forest.ratings.map(function(obj){return obj.rating;})) %>;
+        userRating = <%= ratings.userRating %>;
+        allRatings = <%- JSON.stringify(ratings.allRatings) %>;
     <% } %>
     $('.userRating').on('mouseleave', function(){
         for (var i = 1; i <= 5; i++){
