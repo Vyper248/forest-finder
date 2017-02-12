@@ -1,29 +1,12 @@
-/*Header Page*/
-
-.myNav {
-	width: 100%;
-	background-color: lightGray;
-	padding: 10px;
-	height: 50px;
-}
-
-.myNav-right {
-	float: right;
-}
-
-.myNav-left {
-	float: left;
-}
-
-.navIcon {
-	font-size: 2em;
-	margin: 0px 10px;
-}
 
 /* ------- */
 
 header.jumbotron, .forestName, h1, h2 {
 	text-align: center;
+}
+
+header.jumbotron {
+	background-color: #d3e5d5;
 }
 
 h1 {
