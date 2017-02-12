@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Forest = require('../models/forest');
 var middleware = require('./middleware');
+var helpers = require('./helpers');
 
 router.post('/forests/:id/ratings', middleware.isLoggedIn, function(req, res){
     var forestID = req.params.id;
@@ -29,7 +30,8 @@ router.post('/forests/:id/ratings', middleware.isLoggedIn, function(req, res){
                         console.log(err);
                         res.send('false');
                     } else {
-                        res.send('true');
+                        var ratings = helpers.getRatingObject(forest, req.user);
+                        res.json(ratings);
                     }
                 });
             } else {
@@ -40,7 +42,8 @@ router.post('/forests/:id/ratings', middleware.isLoggedIn, function(req, res){
                         console.log(err);
                         res.send('false');
                     } else {
-                        res.send('true');
+                        var ratings = helpers.getRatingObject(forest, req.user);
+                        res.json(ratings);
                     }
                 });
             }

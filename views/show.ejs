@@ -57,7 +57,19 @@
                 </div>
                 <div class="col-md-12 col-sm-4">
                     <div id="ratings">
-                        <h4>Ratings</h4>
+                        <h4>Rating - 
+                            <div class="rating-stars">
+                                <% for (var i = 1; i <= 5; i++) { %>
+                                    <% if (i <= ratings.average) { %>
+                                        <span class="fa fa-star" id="avgRating<%=i%>" aria-hidden="true"></span>
+                                    <% } else if (ratings.average < i && ratings.average > i-1) { %>
+                                        <span class="fa fa-star-half-o" id="avgRating<%=i%>" aria-hidden="true"></span>
+                                    <% } else { %>
+                                        <span class="fa fa-star-o" id="avgRating<%=i%>" aria-hidden="true"></span>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </h4>
                         <% for (var i = 5; i > 0; i--){ %>
                             <% var starRatings = ratings.starRatings[i-1]; %>
                             <% var percentage = (starRatings / ratings.totalRatings)*100; %>
@@ -67,22 +79,14 @@
                                 <span class="ratingText ratingQuantity" id="ratingQuantity<%=i%>"><%= starRatings %></span>
                             </div>
                         <% } %>
-                        <div class="rating-stars">
-                            <% for (var i = 1; i <= 5; i++) { %>
-                                <% if (i <= ratings.average) { %>
-                                    <span class="glyphicon glyphicon-star" id="avgRating<%=i%>" aria-hidden="true"></span>
-                                <% } else { %>
-                                    <span class="glyphicon glyphicon-star-empty" id="avgRating<%=i%>" aria-hidden="true"></span>
-                                <% } %>
-                            <% } %>
-                        </div>
+
                         <% if (user) { %>
                         <h4 class="userRating">Your Rating: <br>
                             <% for (var i = 1; i <= 5; i++) { %>
                                 <% if (i <= ratings.userRating) { %>
-                                    <span class="glyphicon glyphicon-star userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
+                                    <span class="fa fa-star userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
                                 <% } else { %>
-                                    <span class="glyphicon glyphicon-star-empty userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
+                                    <span class="fa fa-star-o userRatingStar" id="rating<%=i%>" aria-hidden="true"></span>
                                 <% } %>
                             <% } %>
                         </h4>
@@ -245,58 +249,52 @@
     //RATINGS =============================================
     $('.userRatingStar').on('mouseover', function(){
         var id = $(this).attr('id').slice(6,7);
-        for (var i = 1; i <= 5; i++){
-            if (i <= id){
-                $('#rating'+i).addClass('glyphicon-star').removeClass('glyphicon-star-empty');
-            } else {
-                $('#rating'+i).addClass('glyphicon-star-empty').removeClass('glyphicon-star');
-            }
-        }
+        adjustStarRatings('rating', id);
     });
 
     var userRating = 0;
-    var allRatings = [];
-    //if ratings exist for this forest, get user rating (if that also exists - from above)
+    //if ratings exist for this forest, get user rating (if that also exists)
     <% if (forest.ratings) { %>
         userRating = <%= ratings.userRating %>;
-        allRatings = <%- JSON.stringify(ratings.allRatings) %>;
     <% } %>
     $('.userRating').on('mouseleave', function(){
-        for (var i = 1; i <= 5; i++){
-            if (i <= userRating){
-                $('#rating'+i).addClass('glyphicon-star').removeClass('glyphicon-star-empty');
-            } else {
-                $('#rating'+i).addClass('glyphicon-star-empty').removeClass('glyphicon-star');
-            }
-        }
+        adjustStarRatings('rating',userRating);
     });
 
     $('.userRatingStar').on('click', function(){
         var id = $(this).attr('id').slice(6,7);
         $.post('/forests/<%=forest._id%>/ratings', {user: '<%=user.username%>', rating:id}, function(data){
-            if (data === 'true'){
-                updateRatingFrom(userRating, id);
-            }
+            updateRatingsWith(data);
         });
     });
 
-    function updateRatingFrom(oldRating, newRating){
-        userRating = parseInt(newRating);
-        if (oldRating !== 0) allRatings.splice(allRatings.indexOf(oldRating), 1);
-        allRatings.push(userRating);
+    function updateRatingsWith(ratings){
+        if (ratings && ratings.userRating){
+            userRating = ratings.userRating;
+            //for each rating, adjust percentage and values to match rating change
+            for (var i = 5; i > 0; i--){
+                var starRatings = ratings.starRatings[i-1];
+                var percentage = Math.round((starRatings/ratings.totalRatings)*100);
+                $('#ratingProgress'+i).css('width',percentage+'%');
+                $('#ratingQuantity'+i).text(starRatings);
+            }
+            adjustStarRatings('avgRating', ratings.average);
+        }
+    }
 
-        var totalRatings = allRatings.length;
-        var average = allRatings.reduce(function(t,c){return t+=c;}, 0)/totalRatings || 0;
-        average = Math.round(average);
-        for (var i = 5; i > 0; i--){
-            var starRatings = allRatings.filter(function(num){return num === i;}).length;
-            var percentage = Math.round((starRatings/totalRatings)*100);
-            $('#ratingProgress'+i).css('width',percentage+'%');
-            $('#ratingQuantity'+i).text(starRatings);
-            if (i <= average){
-                $('#avgRating'+i).addClass('glyphicon-star').removeClass('glyphicon-star-empty');
-            } else {
-                $('#avgRating'+i).addClass('glyphicon-star-empty').removeClass('glyphicon-star');
+    function adjustStarRatings(id, check){
+        //reset all Stars
+        for (var i = 1; i <= 5; i++){
+            $('#'+id+i).addClass('fa-star-o').removeClass('fa-star fa-star-half-o');
+        }
+
+        //add full stars or half stars if not greater than the check
+        for (var i = 1; i <= check; i++){
+            if (i <= check){
+                $('#'+id+i).addClass('fa-star').removeClass('fa-star-o fa-star-half-o');
+            }
+            if (check > i && check < i+1){//check for half star
+                $('#'+id+(i+1)).addClass('fa-star-half-o').removeClass('fa-star fa-star-o');
             }
         }
     }
