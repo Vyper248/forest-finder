@@ -30,7 +30,7 @@ app.use(flash());
 //DATABASE CONNECTION AND SEED=============================
 //seedDB();
 var databaseURL = process.env.DATABASEURL || 'mongodb://localhost/forests';
-mongoose.connect(databaseURL);
+mongoose.connect(databaseURL, { useNewUrlParser: true, useUnifiedTopology: true });
 
 //MODELS===================================================
 var Forest = require('./models/forest');
@@ -38,8 +38,9 @@ var Comment = require('./models/comment');
 var User = require('./models/user');
 
 //PASSPORT SETUP===========================================
+let sessionSecret = process.env.SESSION_SECRET || 'ztnqp29g7320cn23c9mf0';
 app.use(expressSession({
-	secret: 'ztnqp29g7320cn23c9mf0',
+	secret: sessionSecret,
 	resave: false,
 	saveUninitialized: false
 }));
